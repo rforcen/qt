@@ -16,3 +16,5 @@ void MainWindow::selectPreset(int ps) { ui->dc->setPreset(ps); }
 void MainWindow::setExpression(QString exp) { ui->dc->setExpression(exp); }
 
 void MainWindow::recMessage(QString msg) { ui->statusbar->showMessage(msg); }
+
+void MainWindow::Export() { ui->dc->Export(ui->resol->value()); }

@@ -11,6 +11,7 @@ public:
 
   void setPreset(int ps);
   void setExpression(QString exp);
+  void Export(int resol);
 
 private:
   DomainColoring dc;

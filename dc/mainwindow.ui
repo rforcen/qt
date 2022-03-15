@@ -19,21 +19,52 @@
      <number>9</number>
     </property>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
       <item>
-       <widget class="QComboBox" name="cbPreset">
-        <property name="font">
-         <font>
-          <family>Courier 10 Pitch</family>
-         </font>
+       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0,0">
+        <property name="topMargin">
+         <number>0</number>
         </property>
-        <property name="editable">
-         <bool>true</bool>
-        </property>
-        <property name="currentIndex">
-         <number>-1</number>
-        </property>
-       </widget>
+        <item>
+         <widget class="QComboBox" name="cbPreset">
+          <property name="font">
+           <font/>
+          </property>
+          <property name="editable">
+           <bool>true</bool>
+          </property>
+          <property name="currentIndex">
+           <number>-1</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="resol">
+          <property name="toolTip">
+           <string>export resolution</string>
+          </property>
+          <property name="prefix">
+           <string>res: </string>
+          </property>
+          <property name="minimum">
+           <number>128</number>
+          </property>
+          <property name="maximum">
+           <number>8192</number>
+          </property>
+          <property name="singleStep">
+           <number>32</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="export_2">
+          <property name="text">
+           <string>export</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="QDomainColoring" name="dc" native="true"/>
@@ -74,8 +105,8 @@
    <slot>selectPreset(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>71</x>
-     <y>48</y>
+     <x>260</x>
+     <y>57</y>
     </hint>
     <hint type="destinationlabel">
      <x>3</x>
@@ -90,8 +121,8 @@
    <slot>setExpression(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>117</x>
-     <y>42</y>
+     <x>306</x>
+     <y>57</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -115,10 +146,27 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>export_2</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>Export()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>130</x>
+     <y>41</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>3</x>
+     <y>165</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>selectPreset(int)</slot>
   <slot>setExpression(QString)</slot>
   <slot>recMessage(QString)</slot>
+  <slot>Export()</slot>
  </slots>
 </ui>

@@ -19,6 +19,14 @@ void QDomainColoring::setExpression(QString exp) {
   }
 }
 
+void QDomainColoring::Export(int resol) {
+  image = dc.generate(resol, resol, expr);
+  QImage img((uchar *)image.data(), resol, resol, QImage::Format_ARGB32);
+
+  if (img.save("dc.png"))
+    emit sendMessage("file dc.png exported");
+}
+
 void QDomainColoring::recalc() {
   setSize();
 

@@ -24,5 +24,6 @@ public slots:
   void setExpression(QString);
 
   void recMessage(QString);
+  void Export();
 };
 #endif // MAINWINDOW_H
