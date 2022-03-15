@@ -1,8 +1,9 @@
-QT       += core gui
+QT       += core gui openglwidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++latest
+
 
 QMAKE_CXXFLAGS_RELEASE -= -O2
 QMAKE_CXXFLAGS_RELEASE *= -O3
@@ -17,6 +18,12 @@ SOURCES += \
     qmandelbrot.cpp
 
 HEADERS += \
+    cl/mandelbrotCL.h \
+    cl/opencl.hpp \
+    cl/qcl.hpp \
+    cl/qcl_array.hpp \
+    cl/qcl_boost_compat.hpp \
+    cl/qcl_module.hpp \
     common.h \
     mainwindow.h \
     mandel.h \
@@ -32,3 +39,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     resurces.qrc
+
+unix:!macx: LIBS += -lOpenCL

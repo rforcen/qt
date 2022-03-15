@@ -13,6 +13,7 @@
 #include <QTableWidget>
 #include <QWidget>
 
+#include "cl/mandelbrotCL.h"
 #include "common.h"
 #include "mandel.h"
 
@@ -63,6 +64,9 @@ private:
   Mandelbrot256 mandel256;
   Mandelbrot320 mandel320;
 
+  MandelbrotCL<cl_float, cl_float2> mandelCL32;
+  MandelbrotCL<cl_double, cl_double2> mandelCL64;
+
   Complex128 center = Complex128(0.5, 0), range = Complex128(-2, 2);
 
   QPoint pStart, pEnd;
@@ -71,7 +75,10 @@ private:
   MandelEngine engine = f64;
 
   int w, h;
+  int wimg, himg; // image
   int iters;
+
+  qreal dpr;
 
   QStatusBar *sb = nullptr;
   QTableWidget *tb = nullptr;
@@ -84,6 +91,11 @@ private:
   void refresh() {
     recalc();
     update();
+  }
+
+  template <typename T> // complex # converter
+  complex<T> cconv(const Complex128 &o) {
+    return complex<T>(o.real(), o.imag());
   }
 
   double calcScale() { return 8 / norm(range); } // 8 = norm(-2,2)
@@ -109,6 +121,15 @@ private:
       break;
     case f320_TT:
       image = mandel320.generateTT(w, h, iters, center, range);
+      break;
+
+    case f32_CL:
+      image = mandelCL32.generate(w, h, cconv<cl_float>(center),
+                                  cconv<cl_float>(range), iters);
+      break;
+    case f64_CL:
+      image = mandelCL64.generate(w, h, cconv<cl_double>(center),
+                                  cconv<cl_double>(range), iters);
       break;
     default:
       image.clear();
@@ -143,7 +164,7 @@ protected:
   void keyPressEvent(QKeyEvent *event);
   void wheelEvent(QWheelEvent *event);
 
-private slots:
+public slots:
 
   void bookMarkSel(int row, int col);
   void bookMarkSel(int row, int col, int pr, int pc);

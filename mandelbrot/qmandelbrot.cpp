@@ -1,7 +1,9 @@
 #include "qmandelbrot.h"
+#include <QCoreApplication>
 
 QMandelbrot::QMandelbrot(QWidget *parent) : QWidget{parent} {
   iters = mandel64.iters;
+  dpr = devicePixelRatioF();
 }
 
 QMandelbrot::~QMandelbrot() {}
@@ -97,14 +99,33 @@ void QMandelbrot::resizeEvent(QResizeEvent *) { recalc(); }
 void QMandelbrot::paintEvent(QPaintEvent *) {
 
   QPainter p(this);
+  p.scale(1 / dpr, 1 / dpr);
 
-  QImage img((uchar *)image.data(), w, h, QImage::Format_ARGB32);
+  QImage img((uchar *)image.data(), wimg, himg, QImage::Format_ARGB32);
+
   p.drawImage(0, 0, img);
 
   if (dragging) {
     p.setPen(Qt::white);
-    p.drawRect(QRect(pStart, pEnd));
+    p.drawRect(QRect(pStart * dpr, pEnd * dpr));
   }
+}
+
+void QMandelbrot::recalc() {
+
+  w = width();
+  h = height();
+
+  wimg = w * dpr;
+  himg = h * dpr;
+
+  Timer t0;
+
+  genMandel(wimg, himg);
+
+  if (sb)
+    sb->showMessage(sformat("lap:%ldms, iters:%d, scale:%.2g size:(%d,%d)",
+                            t0.lap(), iters, calcScale(), wimg, himg));
 }
 
 // slots
@@ -145,10 +166,10 @@ void QMandelbrot::addbk() {
   if (tb) {
     tb->insertRow(tb->rowCount());
     const char *fmt = "%'Lf";
-    QVector<QString> sl = {format(fmt, center.real()),
-                           format(fmt, center.imag()),
-                           format(fmt, range.real()), format(fmt, range.imag()),
-                           format("%d", iters)};
+    QVector<QString> sl = {sformat(fmt, center.real()),
+                           sformat(fmt, center.imag()),
+                           sformat(fmt, range.real()),
+                           sformat(fmt, range.imag()), sformat("%d", iters)};
     int i = 0;
     for (auto &s : sl) {
       QTableWidgetItem *newItem = new QTableWidgetItem(s);
@@ -204,16 +225,3 @@ void QMandelbrot::Export() {
 }
 
 //
-
-void QMandelbrot::recalc() {
-  w = width();
-  h = height();
-
-  Timer t0;
-
-  genMandel(w, h);
-
-  if (sb)
-    sb->showMessage(format("lap:%ldms, iters:%d, scale:%.2g size:(%d,%d)",
-                           t0.lap(), iters, calcScale(), w, h));
-}

@@ -3,7 +3,7 @@
 #include <QString>
 
 template <typename... Args>
-QString format(const QString &format, Args... args) {
+QString sformat(const QString &format, Args... args) {
   int size = std::snprintf(nullptr, 0, format.toLatin1().data(), args...) +
              1; // Extra space for '\0'
 

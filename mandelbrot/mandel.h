@@ -98,7 +98,7 @@ public:
     this->iters = iters;
     this->center = center;
     this->range = range;
-    this->cr = ComplexReal(range.real(), (real)range.real());
+    this->cr = ComplexReal(range.real(), range.real());
     this->rir = (range.imag() - range.real());
     this->scale = 0.8 * w / h;
 
@@ -153,7 +153,8 @@ public:
         break;
       }
     }
-    return convertARGB(0xff000000 | ((ix == iters) ? 0 : palette[ix << 2]));
+    return convertARGB(0xff000000 |
+                       ((ix == iters) ? 0 : palette[(ix << 2) % iters]));
   }
 
   inline u32 convertARGB(u32 i) {
