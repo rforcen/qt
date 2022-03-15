@@ -1,6 +1,6 @@
 #pragma once
 
-#include "dc/DomainColoring.h"
+#include "dc_base/DomainColoring.h"
 #include <QPainter>
 #include <QWidget>
 

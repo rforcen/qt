@@ -15,10 +15,10 @@ SOURCES += \
 
 HEADERS += \
     common.h \
-    dc/DomainColoring.h \
-    dc/Thread.h \
-    dc/Timer.h \
-    dc/zCompiler.h \
+    dc_base/DomainColoring.h \
+    dc_base/Thread.h \
+    dc_base/Timer.h \
+    dc_base/zCompiler.h \
     mainwindow.h \
     qdomaincoloring.h
 

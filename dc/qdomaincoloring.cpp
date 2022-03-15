@@ -1,6 +1,6 @@
 #include "qdomaincoloring.h"
 #include "common.h"
-#include "dc/Timer.h"
+#include "dc_base/Timer.h"
 
 QDomainColoring::QDomainColoring(QWidget *parent) : QWidget{parent} {
   dpr = devicePixelRatioF();
