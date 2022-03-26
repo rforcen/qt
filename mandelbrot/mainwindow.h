@@ -26,5 +26,12 @@ private:
 
   QSettings *settings = nullptr;
   void loadSettings(), saveSettings();
+
+protected:
+  void keyPressEvent(QKeyEvent *event);
+
+public slots:
+  void horzScr(int action); // h/v scroll
+  void vertScr(int action);
 };
 #endif // MAINWINDOW_H

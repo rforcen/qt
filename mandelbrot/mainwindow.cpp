@@ -46,3 +46,54 @@ void MainWindow::saveSettings() {
 
   delete settings;
 }
+
+// events
+void MainWindow::keyPressEvent(QKeyEvent *event) {
+  switch (event->key()) {
+  case Qt::Key_Space:
+    ui->mandelbrot->resetView();
+    break;
+
+  case Qt::Key_PageUp:
+    ui->mandelbrot->incIters(+20);
+    break;
+  case Qt::Key_PageDown:
+    ui->mandelbrot->incIters(-20);
+    break;
+
+  case Qt::Key_Plus:
+    ui->mandelbrot->addbk();
+    break;
+  case Qt::Key_Minus:
+    ui->mandelbrot->delbk();
+    break;
+
+  case Qt::Key_Escape:
+    close();
+  }
+}
+
+// slots
+void MainWindow::horzScr(int action) {
+  switch (action) {
+  case QAbstractSlider::SliderSingleStepAdd:
+    ui->mandelbrot->horzScr(+10);
+    break;
+  case QAbstractSlider::SliderSingleStepSub:
+    ui->mandelbrot->horzScr(-10);
+    break;
+  }
+
+  ui->hsb->setValue(50);
+}
+void MainWindow::vertScr(int action) {
+  switch (action) {
+  case QAbstractSlider::SliderSingleStepAdd:
+    ui->mandelbrot->vertScr(+10);
+    break;
+  case QAbstractSlider::SliderSingleStepSub:
+    ui->mandelbrot->vertScr(-10);
+    break;
+  }
+  ui->vsb->setValue(50);
+}

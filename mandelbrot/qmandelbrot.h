@@ -17,6 +17,8 @@
 #include "common.h"
 #include "mandel.h"
 
+using f128 = long double;
+
 class QMandelbrot : public QWidget {
   Q_OBJECT
 
@@ -56,6 +58,11 @@ public:
     }
   }
 
+  f128 calcOff(int off) {
+    f128 ratio = (range.imag() - range.real()) / 10;
+    return ratio * off / 100;
+  }
+
 private:
   Mandelbrot32 mandel32;
   Mandelbrot64 mandel64;
@@ -63,8 +70,10 @@ private:
   Mandelbrot192 mandel192;
   Mandelbrot256 mandel256;
   Mandelbrot320 mandel320;
+  MandelbrotMPFR mandel_mpfr;
 
   MandelbrotCL<cl_float, cl_float2> mandelCL32;
+
   MandelbrotCL<cl_double, cl_double2> mandelCL64;
 
   Complex128 center = Complex128(0.5, 0), range = Complex128(-2, 2);
@@ -72,7 +81,7 @@ private:
   QPoint pStart, pEnd;
   bool dragging = false;
   vector<u32> image;
-  MandelEngine engine = f64;
+  MandelEngine engine = Eng_f64;
 
   int w, h;
   int wimg, himg; // image
@@ -87,10 +96,16 @@ private:
 
   QString fileName;
 
+public:
   void recalc();
   void refresh() {
     recalc();
     update();
+  }
+
+  void incIters(int inc) {
+    iters = std::max(iters + inc, 200);
+    refresh();
   }
 
   template <typename T> // complex # converter
@@ -104,32 +119,57 @@ private:
   void genMandel(int w, int h) {
 
     switch (engine) {
-    case f32:
+    case Eng_f32:
       image = mandel32.generate(w, h, iters, center, range);
       break;
-    case f64:
+    case Eng_f64:
       image = mandel64.generate(w, h, iters, center, range);
       break;
-    case f128:
+    case Eng_f128:
       image = mandel128.generate(w, h, iters, center, range);
       break;
-    case f192_TT:
+    case Eng_f192_TT:
       image = mandel192.generateTT(w, h, iters, center, range);
       break;
-    case f256_TT:
+    case Eng_f256_TT:
       image = mandel256.generateTT(w, h, iters, center, range);
       break;
-    case f320_TT:
+    case Eng_f320_TT:
       image = mandel320.generateTT(w, h, iters, center, range);
       break;
 
-    case f32_CL:
+    case Eng_f32_CL:
       image = mandelCL32.generate(w, h, cconv<cl_float>(center),
                                   cconv<cl_float>(range), iters);
       break;
-    case f64_CL:
+    case Eng_f64_CL:
       image = mandelCL64.generate(w, h, cconv<cl_double>(center),
                                   cconv<cl_double>(range), iters);
+      break;
+
+    case Eng_f192:
+      mandel_mpfr.setPrecisionBits(192);
+      image = mandel_mpfr.generate(w, h, iters, center, range);
+      break;
+    case Eng_f256:
+      mandel_mpfr.setPrecisionBits(256);
+      image = mandel_mpfr.generate(w, h, iters, center, range);
+      break;
+    case Eng_f512:
+      mandel_mpfr.setPrecisionBits(512);
+      image = mandel_mpfr.generate(w, h, iters, center, range);
+      break;
+    case Eng_f1024:
+      mandel_mpfr.setPrecisionBits(1024);
+      image = mandel_mpfr.generate(w, h, iters, center, range);
+      break;
+    case Eng_f2048:
+      mandel_mpfr.setPrecisionBits(2048);
+      image = mandel_mpfr.generate(w, h, iters, center, range);
+      break;
+    case Eng_f4096:
+      mandel_mpfr.setPrecisionBits(4096);
+      image = mandel_mpfr.generate(w, h, iters, center, range);
       break;
     default:
       image.clear();
@@ -161,7 +201,7 @@ protected:
   void mousePressEvent(QMouseEvent *event);
   void mouseReleaseEvent(QMouseEvent *event);
   void mouseMoveEvent(QMouseEvent *);
-  void keyPressEvent(QKeyEvent *event);
+
   void wheelEvent(QWheelEvent *event);
 
 public slots:
@@ -182,6 +222,8 @@ public slots:
 
   void Export();
 
+  void horzScr(int off); // h/v scroll
+  void vertScr(int off);
 signals:
 };
 

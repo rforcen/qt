@@ -1,6 +1,5 @@
 // mandel
 // g++ -O3 mandel.cpp -o mandel -pthread
-// using magick: `Magick++-config --cxxflags --cppflags`
 
 #pragma once
 
@@ -13,13 +12,14 @@
 #include <string>
 #include <vector>
 
+#pragma GCC diagnostic ignored "-Wuninitialized"
 #include "ttmath/ttmath.h"
 
-//#include <mpreal.h>
+#include <mpreal.h>
 
 #include "firePalette.h"
 
-// using mpfr::mpreal;
+using mpfr::mpreal;
 using std::complex, std::vector, std::string, std::to_string;
 
 typedef uint32_t u32;
@@ -30,24 +30,28 @@ typedef ttmath::Big<1, 3> float192;
 typedef ttmath::Big<1, 4> float256;
 typedef ttmath::Big<1, 5> float320;
 
+using f32 = float;
+using f64 = double;
+using f128 = long double;
+
 enum MandelEngine {
-  f32, // c++ scalar
-  f64,
-  f128,
+  Eng_f32, // c++ scalar
+  Eng_f64,
+  Eng_f128,
 
-  f192_TT, // ttmath
-  f256_TT,
-  f320_TT,
+  Eng_f192_TT, // ttmath
+  Eng_f256_TT,
+  Eng_f320_TT,
 
-  f32_CL, // CL
-  f64_CL,
+  Eng_f32_CL, // CL
+  Eng_f64_CL,
 
-  f192, // mpfr
-  f256,
-  f512,
-  f1024,
-  f2048,
-  f4096
+  Eng_f192, // mpfr
+  Eng_f256,
+  Eng_f512,
+  Eng_f1024,
+  Eng_f2048,
+  Eng_f4096
 };
 
 // Mandelbrot
@@ -73,8 +77,7 @@ private:
   }
 
 public:
-  Mandelbrot() {}
-
+  explicit Mandelbrot() {}
   Mandelbrot(ComplexReal center, ComplexReal range, int iters) {
     this->center = center;
     this->range = range;
@@ -90,6 +93,12 @@ public:
     firePalette.resize(iters);
     palette = firePalette.getPalette();
   }
+
+  // mpfr
+  void setPrecisionBits(int bits) {
+    mpreal::set_default_prec(bits); // mpfr::digits2bits(digits));
+  }
+  void setDigits(int d) { mpreal::set_default_prec(mpfr::digits2bits(d)); }
 
   vector<u32> generate(int w, int h, int iters, Complex128 center,
                        Complex128 range) {
@@ -201,6 +210,9 @@ using Mandelbrot128 = Mandelbrot<long double>;
 using Mandelbrot192 = Mandelbrot<float192>;
 using Mandelbrot256 = Mandelbrot<float256>;
 using Mandelbrot320 = Mandelbrot<float320>;
+
+// mpfr
+using MandelbrotMPFR = Mandelbrot<mpreal>;
 
 // MandelDef
 class MandelDef {

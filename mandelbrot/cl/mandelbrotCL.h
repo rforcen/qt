@@ -2,6 +2,8 @@
 
 #pragma once
 
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+
 #include "firePalette.h"
 #include "qcl.hpp"
 #include "qcl_module.hpp"

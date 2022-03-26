@@ -1,4 +1,4 @@
-QT       += core gui openglwidgets
+QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -40,4 +40,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     resurces.qrc
 
-unix:!macx: LIBS += -lOpenCL
+unix:!macx: LIBS += -lOpenCL -lmpfr

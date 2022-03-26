@@ -1,5 +1,4 @@
 #include "qmandelbrot.h"
-#include <QCoreApplication>
 
 QMandelbrot::QMandelbrot(QWidget *parent) : QWidget{parent} {
   iters = mandel64.iters;
@@ -23,7 +22,9 @@ void QMandelbrot::mouseReleaseEvent(QMouseEvent *event) {
 
   pEnd = event->pos();
 
-  if (pStart == pEnd) {
+  auto r = QRect(pStart, pEnd).normalized();
+
+  if (std::min(r.width(), r.height()) < 10) {
     const int c = 150;
     pStart -= QPoint(c, c);
     pEnd += QPoint(c, c);
@@ -64,34 +65,6 @@ void QMandelbrot::wheelEvent(QWheelEvent *event) {
   range = complex<double>(range.real() * scale, range.imag() * scale);
 
   refresh();
-}
-
-void QMandelbrot::keyPressEvent(QKeyEvent *event) {
-  switch (event->key()) {
-  case Qt::Key_Space:
-    resetView();
-    break;
-
-  case Qt::Key_PageUp:
-    iters = std::max(iters - 20, 200);
-    refresh();
-    break;
-  case Qt::Key_PageDown:
-    iters += 20;
-    refresh();
-    break;
-
-  case Qt::Key_Plus:
-    addbk();
-    break;
-  case Qt::Key_Minus:
-    delbk();
-    break;
-
-  case Qt::Key_Escape:
-    if (wnd)
-      wnd->close();
-  }
 }
 
 void QMandelbrot::resizeEvent(QResizeEvent *) { recalc(); }
@@ -224,4 +197,13 @@ void QMandelbrot::Export() {
   }
 }
 
+void QMandelbrot::vertScr(int off) {
+  center.imag(center.imag() + calcOff(off));
+  refresh();
+}
+
+void QMandelbrot::horzScr(int off) {
+  center.real(center.real() + calcOff(off));
+  refresh();
+}
 //

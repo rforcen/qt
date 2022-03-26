@@ -8,34 +8,34 @@
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
-
 
 #ifndef QCL_MODULE_HPP
 #define QCL_MODULE_HPP
 
-#include <string>
 #include <memory>
+#include <string>
 #include <vector>
 
+#include <CL/opencl.hpp>
 #include <boost/preprocessor/stringize.hpp>
-#include <CL/cl2.hpp>
 
 #include "qcl.hpp"
 
@@ -51,9 +51,11 @@
 ///
 /// Modules come in two variants:
 /// * An existing class/struct can be turned into a module. This requires
-/// at least a call to \c QCL_MAKE_MODULE(class name) and \c QCL_MAKE_SOURCE(source)
-/// * Standalone modules. These require a call to \c QCL_STANDALONE_MODULE(module name)
-/// and must be terminated by a call to \c QCL_STANDALONE_SOURCE(source code).
+/// at least a call to \c QCL_MAKE_MODULE(class name) and \c
+/// QCL_MAKE_SOURCE(source)
+/// * Standalone modules. These require a call to \c
+/// QCL_STANDALONE_MODULE(module name) and must be terminated by a call to \c
+/// QCL_STANDALONE_SOURCE(source code).
 ///
 /// A standalone module may look like this:
 /// \code
@@ -87,10 +89,11 @@
 /// cl::Buffer b = ...
 /// my_module<T,Scale>::my_kernel_a(ctx, /*work dim*/), /*group dim*/)(a, b);
 /// \endcode
-/// and similarly for \c my_kernel_b. Note that these calls are always asynchronous (
-/// you can pass a cl::Event pointer if you want to wait for them to complete).
-/// You do \bold not need to explicitly compile the source code before executing these
-/// calls, the source will be compiled the first time they are executed.
+/// and similarly for \c my_kernel_b. Note that these calls are always
+/// asynchronous ( you can pass a cl::Event pointer if you want to wait for them
+/// to complete). You do \bold not need to explicitly compile the source code
+/// before executing these calls, the source will be compiled the first time
+/// they are executed.
 ///
 /// You can also extend an existing class into a source module (this
 /// may be more convenient, if you have part of the algorithm already
@@ -127,95 +130,92 @@
 namespace qcl {
 namespace detail {
 
-template<class T>
-struct cl_type_translator
-{
-};
+template <class T> struct cl_type_translator {};
 
-#define DECLARE_TYPE_TRANSLATOR(T, cl_value) \
-  template<> struct cl_type_translator<T>    \
-  { static constexpr const char* value = BOOST_PP_STRINGIZE(cl_value); }
+#define DECLARE_TYPE_TRANSLATOR(T, cl_value)                                   \
+  template <> struct cl_type_translator<T> {                                   \
+    static constexpr const char *value = BOOST_PP_STRINGIZE(cl_value);         \
+  }
 
-DECLARE_TYPE_TRANSLATOR(char,     char);
-DECLARE_TYPE_TRANSLATOR(short,    short);
-DECLARE_TYPE_TRANSLATOR(int,      int);
-DECLARE_TYPE_TRANSLATOR(long,     int);
-DECLARE_TYPE_TRANSLATOR(long long,long);
+DECLARE_TYPE_TRANSLATOR(char, char);
+DECLARE_TYPE_TRANSLATOR(short, short);
+DECLARE_TYPE_TRANSLATOR(int, int);
+DECLARE_TYPE_TRANSLATOR(long, int);
+DECLARE_TYPE_TRANSLATOR(long long, long);
 
-DECLARE_TYPE_TRANSLATOR(unsigned char,     uchar);
-DECLARE_TYPE_TRANSLATOR(unsigned short,    ushort);
-DECLARE_TYPE_TRANSLATOR(unsigned,          uint);
-DECLARE_TYPE_TRANSLATOR(unsigned long,     uint);
-DECLARE_TYPE_TRANSLATOR(unsigned long long,ulong);
+DECLARE_TYPE_TRANSLATOR(unsigned char, uchar);
+DECLARE_TYPE_TRANSLATOR(unsigned short, ushort);
+DECLARE_TYPE_TRANSLATOR(unsigned, uint);
+DECLARE_TYPE_TRANSLATOR(unsigned long, uint);
+DECLARE_TYPE_TRANSLATOR(unsigned long long, ulong);
 
 DECLARE_TYPE_TRANSLATOR(float, float);
 DECLARE_TYPE_TRANSLATOR(double, double);
 
-DECLARE_TYPE_TRANSLATOR(cl_float2,  float2);
-DECLARE_TYPE_TRANSLATOR(cl_float4,  float4);
-DECLARE_TYPE_TRANSLATOR(cl_float8,  float8);
+DECLARE_TYPE_TRANSLATOR(cl_float2, float2);
+DECLARE_TYPE_TRANSLATOR(cl_float4, float4);
+DECLARE_TYPE_TRANSLATOR(cl_float8, float8);
 DECLARE_TYPE_TRANSLATOR(cl_float16, float16);
 
-DECLARE_TYPE_TRANSLATOR(cl_double2,  double2);
-DECLARE_TYPE_TRANSLATOR(cl_double4,  double4);
-DECLARE_TYPE_TRANSLATOR(cl_double8,  double8);
+DECLARE_TYPE_TRANSLATOR(cl_double2, double2);
+DECLARE_TYPE_TRANSLATOR(cl_double4, double4);
+DECLARE_TYPE_TRANSLATOR(cl_double8, double8);
 DECLARE_TYPE_TRANSLATOR(cl_double16, double16);
 
-DECLARE_TYPE_TRANSLATOR(cl_uchar2,  uchar2);
-DECLARE_TYPE_TRANSLATOR(cl_uchar4,  uchar4);
-DECLARE_TYPE_TRANSLATOR(cl_uchar8,  uchar8);
+DECLARE_TYPE_TRANSLATOR(cl_uchar2, uchar2);
+DECLARE_TYPE_TRANSLATOR(cl_uchar4, uchar4);
+DECLARE_TYPE_TRANSLATOR(cl_uchar8, uchar8);
 DECLARE_TYPE_TRANSLATOR(cl_uchar16, uchar16);
 
-DECLARE_TYPE_TRANSLATOR(cl_char2,  char2);
-DECLARE_TYPE_TRANSLATOR(cl_char4,  char4);
-DECLARE_TYPE_TRANSLATOR(cl_char8,  char8);
+DECLARE_TYPE_TRANSLATOR(cl_char2, char2);
+DECLARE_TYPE_TRANSLATOR(cl_char4, char4);
+DECLARE_TYPE_TRANSLATOR(cl_char8, char8);
 DECLARE_TYPE_TRANSLATOR(cl_char16, char16);
 
-DECLARE_TYPE_TRANSLATOR(cl_short2,  short2);
-DECLARE_TYPE_TRANSLATOR(cl_short4,  short4);
-DECLARE_TYPE_TRANSLATOR(cl_short8,  short8);
+DECLARE_TYPE_TRANSLATOR(cl_short2, short2);
+DECLARE_TYPE_TRANSLATOR(cl_short4, short4);
+DECLARE_TYPE_TRANSLATOR(cl_short8, short8);
 DECLARE_TYPE_TRANSLATOR(cl_short16, short16);
 
-DECLARE_TYPE_TRANSLATOR(cl_ushort2,  ushort2);
-DECLARE_TYPE_TRANSLATOR(cl_ushort4,  ushort4);
-DECLARE_TYPE_TRANSLATOR(cl_ushort8,  ushort8);
+DECLARE_TYPE_TRANSLATOR(cl_ushort2, ushort2);
+DECLARE_TYPE_TRANSLATOR(cl_ushort4, ushort4);
+DECLARE_TYPE_TRANSLATOR(cl_ushort8, ushort8);
 DECLARE_TYPE_TRANSLATOR(cl_ushort16, ushort16);
 
-DECLARE_TYPE_TRANSLATOR(cl_int2,  int2);
-DECLARE_TYPE_TRANSLATOR(cl_int4,  int4);
-DECLARE_TYPE_TRANSLATOR(cl_int8,  int8);
+DECLARE_TYPE_TRANSLATOR(cl_int2, int2);
+DECLARE_TYPE_TRANSLATOR(cl_int4, int4);
+DECLARE_TYPE_TRANSLATOR(cl_int8, int8);
 DECLARE_TYPE_TRANSLATOR(cl_int16, int16);
 
-DECLARE_TYPE_TRANSLATOR(cl_uint2,  uint2);
-DECLARE_TYPE_TRANSLATOR(cl_uint4,  uint4);
-DECLARE_TYPE_TRANSLATOR(cl_uint8,  uint8);
+DECLARE_TYPE_TRANSLATOR(cl_uint2, uint2);
+DECLARE_TYPE_TRANSLATOR(cl_uint4, uint4);
+DECLARE_TYPE_TRANSLATOR(cl_uint8, uint8);
 DECLARE_TYPE_TRANSLATOR(cl_uint16, uint16);
 
-DECLARE_TYPE_TRANSLATOR(cl_long2,  long2);
-DECLARE_TYPE_TRANSLATOR(cl_long4,  long4);
-DECLARE_TYPE_TRANSLATOR(cl_long8,  long8);
+DECLARE_TYPE_TRANSLATOR(cl_long2, long2);
+DECLARE_TYPE_TRANSLATOR(cl_long4, long4);
+DECLARE_TYPE_TRANSLATOR(cl_long8, long8);
 DECLARE_TYPE_TRANSLATOR(cl_long16, long16);
 
-DECLARE_TYPE_TRANSLATOR(cl_ulong2,  ulong2);
-DECLARE_TYPE_TRANSLATOR(cl_ulong4,  ulong4);
-DECLARE_TYPE_TRANSLATOR(cl_ulong8,  ulong8);
+DECLARE_TYPE_TRANSLATOR(cl_ulong2, ulong2);
+DECLARE_TYPE_TRANSLATOR(cl_ulong4, ulong4);
+DECLARE_TYPE_TRANSLATOR(cl_ulong8, ulong8);
 DECLARE_TYPE_TRANSLATOR(cl_ulong16, ulong16);
 
-
-}
-}
+} // namespace detail
+} // namespace qcl
 
 /// This macro, together with \c QCL_MAKE_SOURCE is required
 /// to turn an existing class into a QCL module. This macro
 /// must be called in the public section of the class that should
 /// become a qcl module.
 /// \param module_name The name of the class
-#define QCL_MAKE_MODULE(module_name)                           \
-    typedef module_name _qcl_this_type;                        \
-    static std::string _qcl_get_module_name()                  \
-    {return typeid(_qcl_this_type).name();}                    \
-    static std::string _qcl_source(){return _qcl_private_source();}
-
+#define QCL_MAKE_MODULE(module_name)                                           \
+  typedef module_name _qcl_this_type;                                          \
+  static std::string _qcl_get_module_name() {                                  \
+    return typeid(_qcl_this_type).name();                                      \
+  }                                                                            \
+  static std::string _qcl_source() { return _qcl_private_source(); }
 
 /// This macro, together with \c QCL_MAKE_MODULE is required
 /// to turn an existing class into a QCL module.
@@ -233,22 +233,19 @@ DECLARE_TYPE_TRANSLATOR(cl_ulong16, ulong16);
 /// )
 /// \endcode
 /// \param source_code A string containing the CL source code.
-#define QCL_MAKE_SOURCE(source_code) \
-  static std::string _qcl_private_source()      \
-  {                                             \
-    std::string code = source_code;             \
-    std::string include_guard = "QCL_MODULE_"+_qcl_get_module_name()+"_CL"; \
-    return "#ifndef "+include_guard             \
-        +"\n#define "+include_guard             \
-        +"\n"+code                              \
-        +"\n#endif\n";                          \
+#define QCL_MAKE_SOURCE(source_code)                                           \
+  static std::string _qcl_private_source() {                                   \
+    std::string code = source_code;                                            \
+    std::string include_guard =                                                \
+        "QCL_MODULE_" + _qcl_get_module_name() + "_CL";                        \
+    return "#ifndef " + include_guard + "\n#define " + include_guard + "\n" +  \
+           code + "\n#endif\n";                                                \
   }
-
 
 /// Start a standalone module. Must be followed by \c QCL_STANDALONE_SOURCE()
 /// to end the module.
-#define QCL_STANDALONE_MODULE(module_name)                     \
-  struct module_name {                                         \
+#define QCL_STANDALONE_MODULE(module_name)                                     \
+  struct module_name {                                                         \
     QCL_MAKE_MODULE(module_name)
 
 /// Define source code for a standalone module. Must be preceded
@@ -266,9 +263,10 @@ DECLARE_TYPE_TRANSLATOR(cl_ulong16, ulong16);
 /// )
 /// \endcode
 /// \param source_code CL source code
-#define QCL_STANDALONE_SOURCE(source_code)           \
-   QCL_MAKE_SOURCE(source_code) \
- };
+#define QCL_STANDALONE_SOURCE(source_code)                                     \
+  QCL_MAKE_SOURCE(source_code)                                                 \
+  }                                                                            \
+  ;
 
 /// Defines an entrypoint. For standalone modules, must be called
 /// between \c QCL_STANDALONE_MODULE() and \c QCL_STANDALONE_SOURCE().
@@ -278,27 +276,19 @@ DECLARE_TYPE_TRANSLATOR(cl_ulong16, ulong16);
 /// the kernel.
 /// \param kernel_name The entrypoint's name. Must correspond to
 /// a kernel in the CL source
-#define QCL_ENTRYPOINT(kernel_name) \
-  static \
-  qcl::kernel_call kernel_name(const qcl::device_context_ptr& ctx,  \
-                               const cl::NDRange& minimum_work_dim, \
-                               const cl::NDRange& group_dim,        \
-                               cl::Event* evt = nullptr,            \
-                               std::vector<cl::Event>* dependencies = nullptr) \
-  { \
-    std::string kernel_name = BOOST_PP_STRINGIZE(kernel_name);                \
-    ctx->register_source_code(_qcl_source(),                                  \
-                             std::vector<std::string>{kernel_name},           \
-                             _qcl_get_module_name(),                          \
-                             _qcl_get_module_name());                         \
-    return qcl::kernel_call(ctx,                                              \
-                            ctx->get_kernel(_qcl_get_module_name()+"::"+kernel_name),\
-                            minimum_work_dim,                                 \
-                            group_dim,                                        \
-                            evt,                                              \
-                            dependencies);                                    \
+#define QCL_ENTRYPOINT(kernel_name)                                            \
+  static qcl::kernel_call kernel_name(                                         \
+      const qcl::device_context_ptr &ctx, const cl::NDRange &minimum_work_dim, \
+      const cl::NDRange &group_dim, cl::Event *evt = nullptr,                  \
+      std::vector<cl::Event> *dependencies = nullptr) {                        \
+    std::string kernel_name = BOOST_PP_STRINGIZE(kernel_name);                 \
+    ctx->register_source_code(_qcl_source(),                                   \
+                              std::vector<std::string>{kernel_name},           \
+                              _qcl_get_module_name(), _qcl_get_module_name()); \
+    return qcl::kernel_call(                                                   \
+        ctx, ctx->get_kernel(_qcl_get_module_name() + "::" + kernel_name),     \
+        minimum_work_dim, group_dim, evt, dependencies);                       \
   }
-
 
 /// Makes a different module accessible from the current CL module.
 /// This call must be nested inside a \c QCL_STANDALONE_SOURCE() or
@@ -306,25 +296,27 @@ DECLARE_TYPE_TRANSLATOR(cl_ulong16, ulong16);
 /// Note that currently, there is no dedection of cyclic dependencies,
 /// so be careful when including modules.
 /// \param module The name of the source module that shall be included
-#define QCL_INCLUDE_MODULE(module) module::_qcl_source()+
+#define QCL_INCLUDE_MODULE(module) module::_qcl_source() +
 
 /// Make a template type argument accessible from the CL source.
 /// This call must be nested inside a \c QCL_STANDALONE_SOURCE() or
 /// \c QCL_MAKE_SOURCE() call (see their documentation for more information).
 /// \param template_parameter The template parameter
-#define QCL_IMPORT_TYPE(template_parameter) \
-  std::string{"\n#define " BOOST_PP_STRINGIZE(template_parameter) " "} \
-  + std::string(qcl::detail::cl_type_translator<template_parameter>::value) \
-  + std::string{"\n"} +
+#define QCL_IMPORT_TYPE(template_parameter)                                    \
+  std::string{                                                                 \
+      "\n#define " BOOST_PP_STRINGIZE(template_parameter) " "} +               \
+      std::string(                                                             \
+          qcl::detail::cl_type_translator<template_parameter>::value) +        \
+      std::string{"\n"} +
 
 /// Make a constant (or a non-type template) available in CL source
 /// code.
 /// This call must be nested inside a \c QCL_STANDALONE_SOURCE() or
 /// \c QCL_MAKE_SOURCE() call (see their documentation for more information).
 /// \param constant_name The name of the constant.
-#define QCL_IMPORT_CONSTANT(constant_name) \
-  std::string("\n#define " BOOST_PP_STRINGIZE(constant_name) " (") \
-  + std::to_string(constant_name)+std::string{")\n"}+
+#define QCL_IMPORT_CONSTANT(constant_name)                                     \
+  std::string("\n#define " BOOST_PP_STRINGIZE(constant_name) " (") +           \
+              std::to_string(constant_name) + std::string{")\n"} +
 
 /// Stringizes the argument, and hence allows to write CL code
 /// (seemingly) outside the quotation marks of a string literal.
@@ -344,11 +336,7 @@ DECLARE_TYPE_TRANSLATOR(cl_ulong16, ulong16);
 /// start with # as well but should be stringized. Example:
 /// \c QCL_PREPROCESSOR(define, NUMBER 1234) is equivalent to
 /// \c #define NUMBER 1234
-#define QCL_PREPROCESSOR(command, content) \
+#define QCL_PREPROCESSOR(command, content)                                     \
   "\n#" BOOST_PP_STRINGIZE(command) " " BOOST_PP_STRINGIZE(content) "\n"
-
-
-
-
 
 #endif
