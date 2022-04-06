@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/">
+        <file>about.html</file>
+        <file>../VSlibQt/rsc/icons/clipcopy.png</file>
+        <file>../VSlibQt/rsc/icons/clipcopy01.png</file>
+        <file>../VSlibQt/rsc/icons/clippaste.ico</file>
+        <file>../VSlibQt/rsc/icons/clippaste01.png</file>
+        <file>../VSlibQt/rsc/icons/delete.ico</file>
+        <file>../VSlibQt/rsc/icons/export.png</file>
+        <file>../VSlibQt/rsc/icons/export1.png</file>
+        <file>../VSlibQt/rsc/icons/exportsound.png</file>
+        <file>../VSlibQt/rsc/icons/play.png</file>
+        <file>../VSlibQt/rsc/icons/rand.png</file>
+        <file>../VSlibQt/rsc/icons/random.png</file>
+        <file>../VSlibQt/rsc/icons/save.png</file>
+        <file>../VSlibQt/rsc/icons/saveas.png</file>
+        <file>../VSlibQt/rsc/icons/stop.png</file>
+        <file>../VSlibQt/rsc/icons/clear.png</file>
+        <file>../VSlibQt/rsc/icons/open.png</file>
+    </qresource>
+</RCC>
