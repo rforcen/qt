@@ -1,0 +1,154 @@
+class MDA {
+ public:
+  MDA(int nDims, ...) {
+    va_list ap;
+    va_start(ap, nDims);
+    for (int i = 0; i < nDims; i++) dimList << va_arg(ap, int);
+    va_end(ap);
+
+    this->nDims = nDims;
+    calcSize();
+    v = new double[calcSize()];
+  }
+  int calcSize() {
+    size = 1;
+    for (auto d : dimList) size *= d;
+    return size;
+  }
+  double value(int n, ...) {
+    va_list ap;
+    va_start(ap, n);
+    int ix = 0;
+    for (int i = 0; i < n; i++) ix += dimList[i] * va_arg(ap, int);
+    return v[ix];
+  }
+
+ private:
+  QVector<int> dimList;
+  double *v = nullptr;
+  int nDims;
+  int size;
+};
+
+
+
+class TestUniquePtr {
+ public:
+  TestUniquePtr() : n(0), v(nullptr) {}
+  TestUniquePtr(int n) : n(n) { v = std::make_unique<double[]>(n); }
+
+  TestUniquePtr& operator=(TestUniquePtr& a) {
+    if (n < a.n) v = std::make_unique<double[]>(a.n);
+
+    for (int i = 0; i < n; i++) v[i] = a.v[i];
+    return *this;
+  }
+  TestUniquePtr& operator=(double a) {
+    for (int i = 0; i < n; i++) v[i] = a;
+    return *this;
+  }
+
+  TestUniquePtr& operator+(TestUniquePtr& a) {
+    TestUniquePtr rv(n);
+    for (int i = 0; i < n; i++) rv.v[i] = v[i] + a.v[i];
+    return rv;
+  }
+
+ private:
+  int n;
+  std::unique_ptr<double[]> v;
+};
+
+
+void testPrt() {
+  TestUniquePtr t(1000000), t2;
+  TestUniquePtr t1;
+  t = 12;
+  t1 = t;
+  t1 = t + t1;
+  t2 = t1 + t1 + t1 + t1;
+}
+
+
+
+void testEigenNN() {
+  const int dl[] = {784, 10, 7, 9, 10};
+  const int nLayers = (sizeof(dl) / sizeof(int)) - 1;
+
+  mdMatrix w;
+  mtx b, o, i;
+  vector v;
+
+  w = cube(nLayers);
+  b = mtx(nLayers);
+
+  for (int l = 0; l < nLayers; l++) {
+    int sz = dl[l], sz1 = dl[l + 1];  // {784,10} {10,7} {7,9} {9,10}
+
+    w[l] = matrix::Random(sz1, sz);
+    b[l] = vector::Random(sz1);
+    o[l] = vector::Zero(sz1);
+
+    o[l] = w[l] * b[l];
+  }
+}
+
+void testMatrix() { testEigenNN(); }
+void testEigen() {
+  matrix m = matrix::Random(3, 3);
+  m = (m + matrix::Constant(3, 3, 1.2)) * 50;
+
+  vector v(3);
+  v << 1, 2, 3;
+  cout << "m=" << endl
+       << m << endl
+       << "v=" << endl
+       << v << endl
+       << "m * v =" << endl
+       << m * v + v << endl;
+
+  const int n = 10;
+  matrix md = matrix::Random(n, n), mr;
+  vector vd(n);
+
+  vd << 1, 2, 3, 4, 5, 6, 7, 8, 9, 0;
+
+  mr = md * vd;
+  cout << endl
+       << "md=" << endl
+       << md << endl
+       << "vd=" << vd << endl
+       << "mr=" << endl
+       << mr << endl;
+}
+
+
+vector feedFWDIter(vector in) {  // iterate version
+  for (int layer = 0; layer < nLayers; layer++)
+    in = sigmoidDot(w[layer], in, b[layer]);
+  return in;
+}
+
+
+// thread
+void doThread() {
+  std::thread t1;
+
+  t1 = std::thread(&NN::calculate, this, 10.0);
+  std::thread t2(&NN::calculate, this, 20.0);
+  t1.join();
+  t2.join();
+}
+// async sample
+double calculate(double z) { return sigmoid(z); }
+void doAsync() {
+  double z = 10;
+  auto f1 = std::async(&NN::calculate, this, z);
+  auto f2 = std::async(&NN::calculate, this, z);
+
+  auto res1 = f1.get();
+  auto res2 = f2.get();
+  res1 = res2;
+}
+
+//  vec mult(const vec &a, const vec &b) { return a.cwiseProduct(b); }
