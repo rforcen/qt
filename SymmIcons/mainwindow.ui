@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>839</width>
+    <height>615</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Symmetric Icons</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout"/>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>839</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="dockPreset">
+   <property name="features">
+    <set>QDockWidget::NoDockWidgetFeatures</set>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea</set>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>Presets</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QTableWidget" name="presetTab">
+          <property name="font">
+           <font>
+            <family>Courier 10 Pitch</family>
+            <pointsize>9</pointsize>
+           </font>
+          </property>
+          <attribute name="horizontalHeaderVisible">
+           <bool>true</bool>
+          </attribute>
+          <attribute name="horizontalHeaderDefaultSectionSize">
+           <number>100</number>
+          </attribute>
+          <attribute name="verticalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>λ</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>α</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>β</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>γ</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>ω</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>sym</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>scale</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockImage">
+   <property name="features">
+    <set>QDockWidget::NoDockWidgetFeatures</set>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::RightDockWidgetArea</set>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2">
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QSymmetricIcon" name="si" native="true"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QSymmetricIcon</class>
+   <extends>QWidget</extends>
+   <header>qsymmetricicon.h</header>
+   <container>1</container>
+   <slots>
+    <slot>setPreset(int)</slot>
+    <slot>setPreset(int,int)</slot>
+    <slot>entered(QModelIndex)</slot>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>presetTab</sender>
+   <signal>cellClicked(int,int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cellClicked(int,int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>192</x>
+     <y>372</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>327</x>
+     <y>571</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>cellClicked(int,int)</slot>
+ </slots>
+</ui>
